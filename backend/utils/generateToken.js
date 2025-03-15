@@ -13,4 +13,4 @@ const generateTokenAndSetCookie =(userId,res)=>{
         secure:process.env.NODE_ENV !== "development"
     });
 };
-export default generateTokenAndSetCookie
+export default generateTokenAndSetCookie;
