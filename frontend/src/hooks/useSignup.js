@@ -1,63 +1,72 @@
-import { useState } from 'react'
-import toast from 'react-hot-toast'
-
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useAuthContext } from "../context/AuthContext";
 
 const useSignup = () => {
-  const [loading,setLoading]=useState(false);
+	const [loading, setLoading] = useState(false);
+	const { setAuthUser } = useAuthContext();
 
-  const signup = async({fullName,username,password,confirmPassword,gender}) => {
-     const success = handleInputErrors({fullName,username,password,confirmPassword,gender})
-     if(!success) return;
+	const signup = async ({ fullName, username, password, confirmPassword, gender }) => {
+		// ✅ Validate inputs before sending request
+		const success = handleInputErrors({ fullName, username, password, confirmPassword, gender });
+		if (!success) return;
 
-    setLoading(true);
-     try {
-      const res = await fetch("/api/auth/signup",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({fullName,username,password,confirmPassword,gender})
-      });
-      if (!res.ok) {
-        // If not, log the error and handle accordingly
-        const errorData = await res.text();  // Get the response as text (e.g., error message from server)
-        console.error("Error response:", errorData);
-        toast.error(`Error: ${errorData}`); // Show error to user
-        return;
-      }
+		setLoading(true);
+		try {
+			const res = await fetch("http://localhost:5000/api/auth/signup", {  // ✅ Use full backend URL
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ fullName, username, password, confirmPassword, gender }),
+			});
 
-      const data = await res.json();
-      if(data.error){
-        throw new Error(data.error)
-      }
-      console.log(data)
-      toast.success("Signup Successful")
-     } catch (error) {
-        toast.error(error.message)
-     }finally{
-      setLoading(false);
-     }
+			// ✅ Log response status and text before JSON parsing
+			console.log("🔍 Response Status:", res.status, res.statusText);
 
-  };
-  return{loading,signup}
-}
+			const textResponse = await res.text();
+			console.log("🔍 Raw API Response:", textResponse);
 
-export default useSignup
+			// ✅ Check if response is empty
+			if (!textResponse.trim()) {
+				throw new Error("Empty response from server. Backend may have crashed or CORS issue.");
+			}
 
+			const data = JSON.parse(textResponse); // ✅ Convert text to JSON
+			if (data.error) {
+				throw new Error(data.error);
+			}
 
-function handleInputErrors({fullName,username,password,confirmPassword,gender}){
-  if(!fullName || !username || !password || !confirmPassword || !gender){
-  toast.error("please fill in all the fields")
-  return false;
-  }
+			// ✅ Save user to local storage and update context
+			localStorage.setItem("chat-user", JSON.stringify(data));
+			setAuthUser(data);
+			toast.success("Signup Successful");
+		} catch (error) {
+			toast.error(error.message);
+			console.error("❌ Signup Error:", error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  if(password !== confirmPassword){
-    toast.error("password didn't match");
-    return false
-  }
+	return { loading, signup };
+};
+export default useSignup;
 
-  if(password.length<8){
-    toast.error("password must be 8 characters long")
-    return false
-  }
+// ✅ Input validation before making API call
+function handleInputErrors({ fullName, username, password, confirmPassword, gender }) {
+	if (!fullName || !username || !password || !confirmPassword || !gender) {
+		toast.error("Please fill in all fields");
+		return false;
+	}
 
-  return true
+	if (password !== confirmPassword) {
+		toast.error("Passwords do not match");
+		return false;
+	}
+
+	if (password.length < 6) {
+		toast.error("Password must be at least 6 characters");
+		return false;
+	}
+
+	return true;
 }

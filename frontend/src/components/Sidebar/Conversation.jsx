@@ -25,7 +25,7 @@ const Conversation = () => {
         <span className='text-xl'>❤️</span>
       </div>
     </div>
-    <div className='divider' my-2 py-2 h-1></div>
+
     </>
   )
 }

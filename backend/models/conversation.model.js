@@ -13,7 +13,6 @@ const conversationSchema=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Message", 
         default:[]
-<<<<<<< HEAD
     },
 ],
 },
@@ -21,11 +20,3 @@ const conversationSchema=new mongoose.Schema({
 );
 const Conversation = mongoose.model("Conversation",conversationSchema)
 export default Conversation;
-=======
-    }]
-},{timestamps:true})
-
-const Conversation = mongoose.model('Conversation', conversationSchema);
-
-export default Conversation
->>>>>>> Pratha
