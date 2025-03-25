@@ -1,31 +1,12 @@
-/* import express from 'express';
-
-
-import { signup } from '../controllers/auth.controller.js';
-import { login } from '../controllers/auth.controller.js';
-import { logout } from '../controllers/auth.controller.js';
-const router = express.Router();
-
-
-
-router.post("/signup",signup);
-
-
-router.get("/login",login);
-
-router.post("/logout",logout);
-
-
-
-
-export default router; */
-import express from 'express';
-import { signup, login, logout } from '../controllers/auth.controller.js'; // ✅ Clean import
+import express from "express";
+import { login, logout, signup } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
-router.post("/signup", signup);  // ✅ Signup (POST)
-router.post("/login", login);    // ✅ Login (POST instead of GET)
-router.post("/logout", logout);  // ✅ Logout (POST)
+router.post("/signup", signup);
+
+router.post("/login", login);
+
+router.post("/logout", logout);
 
 export default router;
